@@ -6,7 +6,9 @@ import cc.xypp.battery_shield.api.ILivingEntityA;
 import cc.xypp.battery_shield.data.DamageNumberType;
 import cc.xypp.battery_shield.data.ShieldType;
 import cc.xypp.battery_shield.helper.TrackingManager;
+import cc.xypp.battery_shield.items.Register;
 import cc.xypp.battery_shield.utils.ShieldUtil;
+import cc.xypp.battery_shield.utils.TypeBinding;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -38,6 +40,7 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityA
         }
         return 0;
     }
+
     @Override
     public void battery_shield$setShield(float shield) {
         shield = Math.min(this.battery_shield$getMaxShield(), shield);
@@ -46,11 +49,23 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityA
             shieldArmor.getTag().putFloat("shield_value",shield);
         }
     }
+
+    @Override
+    public void battery_shield$setShieldType(String shieldType) {
+        ItemStack shieldArmor = ShieldUtil.getShieldArmor((LivingEntity) (Object) this);
+        if (shieldArmor != null && shieldArmor.getTag() != null) {
+            shieldArmor.getTag().putString("shield_type", shieldType);
+        }
+    }
+
     @Override
     public float battery_shield$getMaxShield() {
         ItemStack shieldArmor = ShieldUtil.getShieldArmor((LivingEntity) (Object)this);
         if(shieldArmor != null && shieldArmor.getTag() != null) {
-            return shieldArmor.getTag().getFloat("shield_max");
+            ShieldType type = ShieldType.fromString(shieldArmor.getTag().getString("shield_type"));
+            if (type == null) return 0;
+            TypeBinding binding = Register.TYPE.get(type);
+            return binding.getMaxValue();
         }
         return 0;
     }
@@ -59,7 +74,7 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityA
     public ShieldType battery_shield$getShieldType() {
         ItemStack shieldArmor = ShieldUtil.getShieldArmor((LivingEntity) (Object)this);
         if(shieldArmor != null && shieldArmor.getTag() != null) {
-            return ShieldType.values()[shieldArmor.getTag().getInt("core_level")];
+            return ShieldType.fromString(shieldArmor.getTag().getString("shield_type"));
         }
         return ShieldType.RAW;
     }
@@ -125,16 +140,30 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityA
 
     @Inject(method = "readAdditionalSaveData", at = @At("HEAD"))
     public void readAdditionalSaveData(CompoundTag p_21145_, CallbackInfo ci) {
+        if (!p_21145_.contains("shield_type") || !p_21145_.contains("shield")) return;
+        int max = -1;
+        if (p_21145_.contains("shield_type")) {
+            ShieldType type = ShieldType.fromString(p_21145_.getString("shield_type"));
+            if (type != null && type != ShieldType.RAW) {
+                this.battery_shield$setShieldType(type.getSerializedName());
+                max = Register.TYPE.get(type).getMaxValue();
+            }
+        }
         if(p_21145_.contains("shield")) {
-            this.battery_shield$setShield(p_21145_.getFloat("shield"));
+            float s = p_21145_.getFloat("shield");
+            float shield = max >= 0 ? Math.max(max, s) : s;
+            this.battery_shield$setShield(shield);
         }
-        if(p_21145_.contains("maxShield")) {
-            this.battery_shield$setMaxShield(p_21145_.getFloat("maxShield"));
-        }
+//        if(p_21145_.contains("maxShield")) {
+//            this.battery_shield$setMaxShield(p_21145_.getFloat("maxShield"));
+//        }
     }
     @Inject(method = "addAdditionalSaveData", at = @At("HEAD"))
     public void addAdditionalSaveData(CompoundTag p_21145_, CallbackInfo ci) {
+        ShieldType type = this.battery_shield$getShieldType();
+        if (type != ShieldType.RAW)
+            p_21145_.putString("shield_type", type.getSerializedName());
         p_21145_.putFloat("shield", this.battery_shield$getShield());
-        p_21145_.putFloat("maxShield", this.battery_shield$getMaxShield());
+        // p_21145_.putFloat("maxShield", this.battery_shield$getMaxShield());
     }
 }

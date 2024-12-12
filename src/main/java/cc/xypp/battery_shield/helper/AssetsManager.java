@@ -6,7 +6,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.HashMap;
+
 public class AssetsManager {
+    public static HashMap<ResourceLocation, ImageAssets> IMAGES = new HashMap<>();
     public static class ImageAssets {
         public final ResourceLocation resourceLocation;
         public final int width;
@@ -47,16 +50,40 @@ public class AssetsManager {
         }
     }
 
-    public static ImageAssets SHIELD_BORDER = new ImageAssets("battery_shield", "textures/gui/battery_empty.png", 21, 6);
-    public static ImageAssets SHIELD_WHITE = new ImageAssets("battery_shield", "textures/gui/battery_fill_w.png", 21, 6);
-    public static ImageAssets SHIELD_BLUE = new ImageAssets("battery_shield", "textures/gui/battery_fill_b.png", 21, 6);
-    public static ImageAssets SHIELD_PERPLE = new ImageAssets("battery_shield", "textures/gui/battery_fill_p.png", 21, 6);
-    public static ImageAssets SHIELD_RED = new ImageAssets("battery_shield", "textures/gui/battery_fill_r.png", 21, 6);
-    public static ImageAssets HEALTH_FILL = new ImageAssets("battery_shield", "textures/gui/blood_fill.png", 96, 6);
-    public static ImageAssets HEALTH_EMPTY = new ImageAssets("battery_shield", "textures/gui/blood_empty.png", 96, 6);
-    public static ImageAssets SHIELD_ICON_RED = new ImageAssets("battery_shield", "textures/gui/shield_r.png", 16, 16);
-    public static ImageAssets SHIELD_ICON_PERPLE = new ImageAssets("battery_shield", "textures/gui/shield_p.png", 16, 16);
-    public static ImageAssets SHIELD_ICON_BLUE = new ImageAssets("battery_shield", "textures/gui/shield_b.png", 16, 16);
-    public static ImageAssets SHIELD_ICON_WHITE = new ImageAssets("battery_shield", "textures/gui/shield_w.png", 16, 16);
+    public static ImageAssets register(ResourceLocation location, ResourceLocation assetsPath, int width, int height) {
+        ImageAssets assets = new ImageAssets(assetsPath.getNamespace(), assetsPath.getPath(), width, height);
+        IMAGES.put(location, assets);
+        return assets;
+    }
+
+    private static ImageAssets register(ResourceLocation location, int width, int height) {
+        ImageAssets assets = new ImageAssets(location.getNamespace(),"textures/gui/" + location.getPath() + ".png", width, height);
+        IMAGES.put(location, assets);
+        return assets;
+    }
+
+    private static ResourceLocation byPath(String path) {
+        return new ResourceLocation("battery_shield", path);
+    }
+
+    private static ResourceLocation byPngPath(String path) {
+        return byPath("textures/" + path + ".png");
+    }
+
+    public static ImageAssets SHIELD_BORDER = register(byPath("battery_empty"), 21, 6);
+    public static ImageAssets SHIELD_WHITE = register(byPath("battery_fill_w"), 21, 6);
+    public static ImageAssets SHIELD_BLUE = register(byPath("battery_fill_b"), 21, 6);
+    public static ImageAssets SHIELD_PERPLE = register(byPath("battery_fill_p"), 21, 6);
+    public static ImageAssets SHIELD_RED = register(byPath("battery_fill_r"), 21, 6);
+
+    //----------------------------------------------------------------------------------------------
+    public static ImageAssets HEALTH_FILL = register(byPath("blood_fill"), 96, 6);
+    public static ImageAssets HEALTH_EMPTY = register(byPath("blood_empty"), 96, 6);
+
+    //----------------------------------------------------------------------------------------------
+    public static ImageAssets SHIELD_ICON_RED = register(byPath("shield_r"), 16, 16);
+    public static ImageAssets SHIELD_ICON_PERPLE = register(byPath("shield_p"), 16, 16);
+    public static ImageAssets SHIELD_ICON_BLUE = register(byPath("shield_b"), 16, 16);
+    public static ImageAssets SHIELD_ICON_WHITE = register(byPath("shield_w"), 16, 16);
 
 }

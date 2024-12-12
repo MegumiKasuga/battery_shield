@@ -2,7 +2,9 @@ package cc.xypp.battery_shield.hud;
 
 import cc.xypp.battery_shield.Config;
 import cc.xypp.battery_shield.api.ILivingEntityA;
+import cc.xypp.battery_shield.data.ShieldType;
 import cc.xypp.battery_shield.helper.AssetsManager;
+import cc.xypp.battery_shield.items.Register;
 import cc.xypp.battery_shield.utils.RenderUtils;
 import cc.xypp.battery_shield.utils.ShieldUtil;
 import net.minecraft.client.Minecraft;
@@ -42,7 +44,9 @@ public class PlayerShieldOverlay implements IGuiOverlay {
         float max = iliving.battery_shield$getMaxShield();
         float shield = iliving.battery_shield$getShield();
 
-        RenderUtils.renderBar(guiGraphics, 37, height - 25, 96, 6, AssetsManager.SHIELD_BORDER, ShieldUtil.getShieldTypeByValue(max), shield, max, true);
+        ShieldType type = iliving.battery_shield$getShieldType();
+        if (type == ShieldType.RAW) return;
+        RenderUtils.renderBar(guiGraphics, 37, height - 25, 96, 6, AssetsManager.SHIELD_BORDER, Register.TYPE.get(type).getImage(), shield, max, true);
         RenderUtils.renderHealth(guiGraphics, 40, height - 20, 96, 6, player.getHealth(), player.getMaxHealth(), true);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().scale(0.8f, 0.8f, 0.8f);

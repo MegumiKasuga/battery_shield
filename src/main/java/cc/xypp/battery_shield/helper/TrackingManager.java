@@ -1,8 +1,11 @@
 package cc.xypp.battery_shield.helper;
 
 import cc.xypp.battery_shield.api.ILivingEntityA;
+import cc.xypp.battery_shield.data.ShieldType;
+import cc.xypp.battery_shield.items.Register;
 import cc.xypp.battery_shield.packet.TrackingPackat;
 import cc.xypp.battery_shield.utils.EntityUtil;
+import cc.xypp.battery_shield.utils.TypeBinding;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -44,8 +47,12 @@ public class TrackingManager {
                 entity = Minecraft.getInstance().level.getEntity(packet.id);
             }
             if (entity instanceof LivingEntity) {
-                ((ILivingEntityA) entity).battery_shield$setShield(packet.shield);
-                ((ILivingEntityA) entity).battery_shield$setMaxShield(packet.maxShield);
+                TypeBinding binding = Register.TYPE.getOrDefault(packet.shieldType, null);
+                float maxShield = binding != null ? binding.getMaxValue() : packet.shield;
+                float shield = Math.min(packet.shield, maxShield);
+                ((ILivingEntityA) entity).battery_shield$setShield(shield);
+                ((ILivingEntityA) entity).battery_shield$setShieldType(packet.shieldType.getSerializedName());
+//                ((ILivingEntityA) entity).battery_shield$setMaxShield(packet.maxShield);
             }
         });
         ctx.get().setPacketHandled(true);
@@ -57,9 +64,9 @@ public class TrackingManager {
 
         ILivingEntityA a = (ILivingEntityA) entity;
         if (entity.getType() == EntityType.PLAYER) {
-            INSTANCE.send(PacketDistributor.ALL.noArg(),new TrackingPackat(entity.getId(), a.battery_shield$getShield(), a.battery_shield$getMaxShield()));
+            INSTANCE.send(PacketDistributor.ALL.noArg(),new TrackingPackat(entity.getId(), a.battery_shield$getShield(), a.battery_shield$getShieldType()));
         } else {
-            INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> entity), new TrackingPackat(entity.getId(), a.battery_shield$getShield(), a.battery_shield$getMaxShield()));
+            INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> entity), new TrackingPackat(entity.getId(), a.battery_shield$getShield(), a.battery_shield$getShieldType()));
         }
     }
 }

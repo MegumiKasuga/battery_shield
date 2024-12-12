@@ -5,6 +5,7 @@ import cc.xypp.battery_shield.api.IDamageSourceA;
 import cc.xypp.battery_shield.data.DamageNumberType;
 import cc.xypp.battery_shield.data.ShieldType;
 import cc.xypp.battery_shield.helper.AssetsManager;
+import cc.xypp.battery_shield.items.Register;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -16,22 +17,19 @@ import net.minecraft.world.item.ItemStack;
 import javax.annotation.Nullable;
 
 public class ShieldUtil {
+
+    public static final ResourceLocation CHESTPLATES = new ResourceLocation("forge","armors/chestplates");
     public static ShieldType getShieldTypeByMaxValue(float value) {
-        if(value > Config.shield_pre_level*4) {
-            return ShieldType.SHIELD_RED;
-        } else if(value > Config.shield_pre_level*3) {
-            return ShieldType.SHIELD_PERP;
-        } else if(value > Config.shield_pre_level*2) {
-            return ShieldType.SHIELD_BLUE;
-        } else if(value > 0) {
-            return ShieldType.SHIELD_WHITE;
-        }else{
-            return ShieldType.RAW;
+        if (value <= 0) return ShieldType.RAW;
+        for (int i = 4; i > 0; i--) {
+            if (value > Register.TYPE.get(ShieldType.values()[i]).getMaxValue())
+                return ShieldType.values()[i];
         }
+        return ShieldType.RAW;
     }
     public  static ItemStack getShieldArmorNonCore (LivingEntity entity){
         for (ItemStack armorSlot : entity.getArmorSlots()) {
-            if(armorSlot.is(ItemTags.create(new ResourceLocation("forge","armors/chestplates")))){
+            if(armorSlot.is(ItemTags.create(CHESTPLATES))) {
                 return armorSlot;
             }
         }
@@ -39,39 +37,30 @@ public class ShieldUtil {
     }
     public static @Nullable ItemStack getShieldArmor(LivingEntity entity) {
         for (ItemStack armorSlot : entity.getArmorSlots()) {
-            if(!armorSlot.is(ItemTags.create(new ResourceLocation("forge","armors/chestplates"))))
+            if(!armorSlot.is(ItemTags.create(CHESTPLATES)))
                 continue;
             CompoundTag tag = armorSlot.getTag();
-            if(tag != null && tag.contains("core_level")) {
-                if(!tag.contains("shield_max")){
-                    tag.putFloat("shield_max", getMaxShieldByType(ShieldType.values()[tag.getInt("core_level")]));
-                }
-                if(!tag.contains("shield_value") && tag.contains("shield_max")){
-                    tag.putFloat("shield_value", tag.getFloat("shield_max"));
-                }
-                return armorSlot;
+            if (tag == null || !tag.contains("shield_type")) return null;
+            ShieldType type = ShieldType.fromString(tag.getString("shield_type"));
+//            if(!tag.contains("shield_type")) {
+                // TODO: Changed here from FLOAT value to RESOURCE_LOCATION shield type.
+                // tag.putFloat("shield_max", getMaxShieldByType(ShieldType.values()[tag.getInt("core_level")]));
+//                tag.putString("shield_type", type.getSerializedName());
+//            }
+            if(!tag.contains("shield_value")) {
+                tag.putFloat("shield_value", Register.TYPE.get(type).getMaxValue());
             }
+            return armorSlot;
         }
         return null;
     }
     public static float getMaxShieldByType(ShieldType type) {
-        return switch (type) {
-            case RAW -> 0;
-            case SHIELD_WHITE -> Config.shield_pre_level*2;
-            case SHIELD_BLUE -> Config.shield_pre_level*3;
-            case SHIELD_PERP -> Config.shield_pre_level*4;
-            case SHIELD_RED -> Config.shield_pre_level*5;
-        };
+        return Register.TYPE.get(type).getMaxValue();
     }
     public static String getShieldIdByType(ShieldType type) {
-        return switch (type) {
-            case RAW -> "none";
-            case SHIELD_WHITE -> "white";
-            case SHIELD_BLUE -> "blue";
-            case SHIELD_PERP -> "perp";
-            case SHIELD_RED -> "red";
-        };
+        return type.getSerializedName();
     }
+
     public static AssetsManager.ImageAssets getShieldTypeByValue(float value) {
         if (value > Config.shield_pre_level*4) {
             return AssetsManager.SHIELD_RED;

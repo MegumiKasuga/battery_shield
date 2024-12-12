@@ -9,6 +9,7 @@ import cc.xypp.battery_shield.data.UsageEvent;
 import cc.xypp.battery_shield.helper.DamageNumberManager;
 import cc.xypp.battery_shield.helper.TrackingManager;
 import cc.xypp.battery_shield.helper.UsageEventManager;
+import cc.xypp.battery_shield.items.Register;
 import cc.xypp.battery_shield.utils.EntityUtil;
 import cc.xypp.battery_shield.utils.ShieldUtil;
 import net.minecraft.nbt.CompoundTag;
@@ -66,11 +67,12 @@ public class Server {
             float maxValue = ShieldUtil.getMaxShieldValue((LivingEntity) entity);
             if (maxValue > 50) maxValue = 50;
             a.battery_shield$setShield(maxValue);
-            a.battery_shield$setMaxShield(maxValue);
+//            a.battery_shield$setMaxShield(maxValue);
             if (shieldArmor.getTag() == null) {
                 shieldArmor.setTag(new CompoundTag());
             }
-            shieldArmor.getTag().putInt("core_level", ShieldUtil.getShieldTypeByMaxValue(maxValue).ordinal());
+            shieldArmor.getTag().putString("shield_type", ShieldUtil.getShieldTypeByMaxValue(maxValue).getSerializedName());
+            // shieldArmor.getTag().putInt("core_level", ShieldUtil.getShieldTypeByMaxValue(maxValue).ordinal());
         }
     }
 
@@ -123,11 +125,12 @@ public class Server {
     @SubscribeEvent
     public static void onTooltip(ItemTooltipEvent event) {
         CompoundTag tag = event.getItemStack().getTag();
-        if (tag != null && tag.contains("core_level")) {
-            ShieldType coreLevel = ShieldType.values()[tag.getInt("core_level")];
+        if (tag != null && tag.contains("shield_type")) {
+            ShieldType coreLevel = ShieldType.fromString(tag.getString("shield_type"));
             if (coreLevel == ShieldType.RAW) return;
+            if (coreLevel == null) return;
             String color = ShieldUtil.getShieldIdByType(coreLevel);
-            float maxValue = tag.getFloat("shield_max");
+            float maxValue = Register.TYPE.get(coreLevel).getMaxValue();
             float currentValue = tag.getFloat("shield_value");
 
             event.getToolTip().add(

@@ -1,8 +1,10 @@
 package cc.xypp.battery_shield.recipes;
 
 import cc.xypp.battery_shield.data.ShieldType;
+import cc.xypp.battery_shield.items.Register;
 import cc.xypp.battery_shield.items.ShieldCore.IShieldCore;
 import cc.xypp.battery_shield.utils.ShieldUtil;
+import cc.xypp.battery_shield.utils.TypeBinding;
 import com.google.gson.JsonObject;
 import io.netty.util.SuppressForbidden;
 import net.minecraft.core.RegistryAccess;
@@ -37,21 +39,21 @@ public class ShieldCoreUpgrade  extends SmithingTransformRecipe implements Smith
 
     @Override
     public ItemStack assemble(Container inv, RegistryAccess registryAccess) {
-            ItemStack item = inv.getItem(1).copy();
-            ItemStack core = inv.getItem(2);
-            if (core.getItem() instanceof IShieldCore isc) {
-                ShieldType currentType  = ShieldType.RAW;
-                if (item.getTag() != null && item.getTag().contains("core_level")) {
-                    currentType = ShieldType.values()[item.getTag().getInt("core_level")];
-                }
-
-                if(currentType == isc.getRequired()) {
-                    item.getTag().putInt("core_level",isc.getCoreLevel().ordinal());
-                    item.getTag().putFloat("shield_max", ShieldUtil.getMaxShieldByType(isc.getCoreLevel()));
-                    item.getTag().putFloat("shield_value", ShieldUtil.getMaxShieldByType(isc.getCoreLevel()));
-                    return item;
-                }
-            }
+        ItemStack item = inv.getItem(1).copy();
+        ItemStack core = inv.getItem(2);
+        if (!(core.getItem() instanceof IShieldCore isc)) return ItemStack.EMPTY;
+        ShieldType currentType  = ShieldType.RAW;
+        if (item.getTag() != null && item.getTag().contains("shield_type")) {
+            currentType = ShieldType.fromString(item.getTag().getString("shield_type"));
+        }
+        if(isc.isRequired(currentType)) {
+            TypeBinding binding = Register.TYPE.get(isc.getCoreLevel());
+            item.getTag().putString("shield_type", binding.shield.getSerializedName());
+//            item.getTag().putInt("core_level", );
+//            item.getTag().putFloat("shield_max", ShieldUtil.getMaxShieldByType(isc.getCoreLevel()));
+            item.getTag().putFloat("shield_value", binding.getMaxValue());
+            return item;
+        }
         return ItemStack.EMPTY;
     }
 
