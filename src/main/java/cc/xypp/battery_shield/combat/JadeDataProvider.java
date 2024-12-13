@@ -17,13 +17,13 @@ public enum JadeDataProvider implements IEntityComponentProvider {
 
     @Override
     public void appendTooltip(ITooltip iTooltip, EntityAccessor entityAccessor, IPluginConfig iPluginConfig) {
-        if(entityAccessor.getEntity() instanceof LivingEntity living){
+        if(entityAccessor.getEntity() instanceof LivingEntity living) {
             ILivingEntityA iliving = (ILivingEntityA) living;
             if(iliving.battery_shield$getMaxShield() > 0){
                 String shieldTypeId = ShieldUtil.getShieldIdByType(iliving.battery_shield$getShieldType());
                 iTooltip.add(Component.translatable(String.format("tooltip.battery_shield.level.%s", shieldTypeId),
-                        String.format("%.1f", iliving.battery_shield$getMaxShield()),
-                        String.format("%.1f", iliving.battery_shield$getShield())
+                        String.format("%.1f", iliving.battery_shield$getShield()),
+                        String.format("%.1f", iliving.battery_shield$getMaxShield())
                 ));
             }
         }

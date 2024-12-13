@@ -64,7 +64,8 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityA
         if(shieldArmor != null && shieldArmor.getTag() != null) {
             ShieldType type = ShieldType.fromString(shieldArmor.getTag().getString("shield_type"));
             if (type == null) return 0;
-            TypeBinding binding = Register.TYPE.get(type);
+            TypeBinding binding = type.getBinding();
+            if (binding == null) return 0;
             return binding.getMaxValue();
         }
         return 0;
@@ -146,7 +147,7 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityA
             ShieldType type = ShieldType.fromString(p_21145_.getString("shield_type"));
             if (type != null && type != ShieldType.RAW) {
                 this.battery_shield$setShieldType(type.getSerializedName());
-                max = Register.TYPE.get(type).getMaxValue();
+                max = type.getMaxValue();
             }
         }
         if(p_21145_.contains("shield")) {

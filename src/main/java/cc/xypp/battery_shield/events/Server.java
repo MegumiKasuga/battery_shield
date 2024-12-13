@@ -130,13 +130,13 @@ public class Server {
             if (coreLevel == ShieldType.RAW) return;
             if (coreLevel == null) return;
             String color = ShieldUtil.getShieldIdByType(coreLevel);
-            float maxValue = Register.TYPE.get(coreLevel).getMaxValue();
+            float maxValue = coreLevel.getMaxValue();
             float currentValue = tag.getFloat("shield_value");
 
             event.getToolTip().add(
                     Component.translatable(String.format("tooltip.battery_shield.level.%s", color),
-                            String.format("%.1f", maxValue),
-                            String.format("%.1f", currentValue)
+                            String.format("%.1f", currentValue / maxValue),
+                            String.format("%.1f", maxValue)
                     ));
         }
     }

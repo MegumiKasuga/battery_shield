@@ -47,7 +47,7 @@ public class ShieldCoreUpgrade  extends SmithingTransformRecipe implements Smith
             currentType = ShieldType.fromString(item.getTag().getString("shield_type"));
         }
         if(isc.isRequired(currentType)) {
-            TypeBinding binding = Register.TYPE.get(isc.getCoreLevel());
+            TypeBinding binding = isc.getCoreLevel().getBinding();
             item.getTag().putString("shield_type", binding.shield.getSerializedName());
 //            item.getTag().putInt("core_level", );
 //            item.getTag().putFloat("shield_max", ShieldUtil.getMaxShieldByType(isc.getCoreLevel()));

@@ -4,6 +4,7 @@ import cc.xypp.battery_shield.BatteryShield;
 import cc.xypp.battery_shield.Config;
 import cc.xypp.battery_shield.api.ILivingEntityA;
 import cc.xypp.battery_shield.data.DamageNumberType;
+import cc.xypp.battery_shield.data.ShieldType;
 import cc.xypp.battery_shield.helper.AssetsManager;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -51,31 +52,38 @@ public class RenderUtils {
                                  int x,
                                  int y,
                                  int width,
-                                 int height,
+                                 int height, ShieldType type,
                                  AssetsManager.ImageAssets bg,
                                  AssetsManager.ImageAssets fill,
-                                 float value,
-                                 float max) {
-        renderBar(guiGraphics, x, y, width, height, bg, fill, value, max, false);
+                                 float value) {
+        renderBar(guiGraphics, x, y, width, height, type, bg, fill, value, false);
     }
 
     public static void renderBar(GuiGraphics guiGraphics,
                                  int x,
                                  int y,
                                  int width,
-                                 int height,
+                                 int height, ShieldType type,
                                  AssetsManager.ImageAssets bg,
                                  AssetsManager.ImageAssets fill,
                                  float value,
-                                 float max,
                                  boolean force) {
         if (!Config.display_shield && !force) return;
-        for (int i = 0; i < 5; i++) {
-            renderBarCell(guiGraphics, x + i * width / 5, y, width / 5, height, fill, value - i * 10);
+        TypeBinding binding = type.getBinding();
+        if (binding == null) return;
+        value = Math.min(binding.getMaxValue(), value);
+        float percentage = (float) value / (float) binding.getMaxValue();
+        float k = 1f / (type.level + 1);
+        for (int i = 0; i <= type.level; i++) {
+            // renderBarCell(guiGraphics, x + i * width / 5 + 4, y, width / 5, height, fill, );
+            rbc(guiGraphics, x + i * width / 5, y, percentage > k ? 100 : Math.round((percentage / k)*21), height, fill);
+            // renderBarCell(guiGraphics, x + i * width / 5, y, width / 5, height, bg, 10);
+            rbc(guiGraphics, x + i * width / 5, y, 100, height, bg);
+            percentage -= k;
         }
-        for (int i = 0; i < 5; i++) {
-            renderBarCell(guiGraphics, x + i * width / 5, y, width / 5, height, bg, max - i * 10);
-        }
+//        for (int i = 0; i < 5; i++) {
+//            renderBarCell(guiGraphics, x + i * width / 5, y, width / 5, height, bg, max - i * 10);
+//        }
     }
 
     protected static void renderBarCell(GuiGraphics guiGraphics, int x, int y, int width, int height, AssetsManager.ImageAssets im, float value) {
@@ -90,6 +98,15 @@ public class RenderUtils {
             im.blit(guiGraphics, x, y, 0, 0, realClip, height);
             im.blit(guiGraphics, x + realClip, y, im.width - targetValue, 0, targetValue, height);
         }
+    }
+
+    protected static void rbc(GuiGraphics guiGraphics, int x, int y, int width, int height, AssetsManager.ImageAssets im) {
+        if (width <= 0) return;
+        if (width >= im.width) {
+            im.blit(guiGraphics, x, y, 0, 0, im.width, height);
+            return;
+        }
+        im.blit(guiGraphics, x, y, im.width - width, 0, width, height);
     }
 
     public static void renderDamageNumber(GuiGraphics guiGraphics, int x, int y, DamageNumberType type, double value) {

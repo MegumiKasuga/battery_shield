@@ -9,7 +9,7 @@
   "item.battery_shield.shield_core_p":"Shield core[Purple]",
   "tooltip.battery_shield.level.shield_red":"§cShield Red §9[%s/%s]",
   "tooltip.battery_shield.level.shield_blue":"§bShield Blue §9[%s/%s]",
-  "tooltip.battery_shield.level.shield_perple":"§dShield Purple §9[%s/%s]",
+  "tooltip.battery_shield.level.shield_perp":"§dShield Purple §9[%s/%s]",
   "tooltip.battery_shield.level.shield_white":"§fShield White §9[%s/%s]",
   "item_group.battery_shield.main":"Battery Shield",
   "config.jade.plugin_battery_shield.jade_data_provider": ""

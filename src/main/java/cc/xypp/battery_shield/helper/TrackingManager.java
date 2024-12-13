@@ -47,7 +47,7 @@ public class TrackingManager {
                 entity = Minecraft.getInstance().level.getEntity(packet.id);
             }
             if (entity instanceof LivingEntity) {
-                TypeBinding binding = Register.TYPE.getOrDefault(packet.shieldType, null);
+                TypeBinding binding = packet.shieldType != null ? packet.shieldType.getBinding() : null;
                 float maxShield = binding != null ? binding.getMaxValue() : packet.shield;
                 float shield = Math.min(packet.shield, maxShield);
                 ((ILivingEntityA) entity).battery_shield$setShield(shield);

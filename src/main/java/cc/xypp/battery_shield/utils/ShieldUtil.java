@@ -22,7 +22,7 @@ public class ShieldUtil {
     public static ShieldType getShieldTypeByMaxValue(float value) {
         if (value <= 0) return ShieldType.RAW;
         for (int i = 4; i > 0; i--) {
-            if (value > Register.TYPE.get(ShieldType.values()[i]).getMaxValue())
+            if (value > ShieldType.values()[i].getMaxValue())
                 return ShieldType.values()[i];
         }
         return ShieldType.RAW;
@@ -47,15 +47,15 @@ public class ShieldUtil {
                 // tag.putFloat("shield_max", getMaxShieldByType(ShieldType.values()[tag.getInt("core_level")]));
 //                tag.putString("shield_type", type.getSerializedName());
 //            }
-            if(!tag.contains("shield_value")) {
-                tag.putFloat("shield_value", Register.TYPE.get(type).getMaxValue());
+            if(!tag.contains("shield_value") && type != null) {
+                tag.putFloat("shield_value", type.getMaxValue());
             }
             return armorSlot;
         }
         return null;
     }
     public static float getMaxShieldByType(ShieldType type) {
-        return Register.TYPE.get(type).getMaxValue();
+        return type.getMaxValue();
     }
     public static String getShieldIdByType(ShieldType type) {
         return type.getSerializedName();

@@ -70,10 +70,10 @@ public class Client {
                                 -15,
                                 96,
                                 6,
+                                iLivingEntityA.battery_shield$getShieldType(),
                                 AssetsManager.SHIELD_BORDER,
                                 ShieldUtil.getShieldTypeByValue(iLivingEntityA.battery_shield$getMaxShield()),
-                                iLivingEntityA.battery_shield$getShield(),
-                                iLivingEntityA.battery_shield$getMaxShield());
+                                iLivingEntityA.battery_shield$getShield());
                     RenderUtils.renderHealth(guiGraphics, -50, -10, 96, 6, living.getHealth(), living.getMaxHealth());
                     poseStack.popPose();
                 });
