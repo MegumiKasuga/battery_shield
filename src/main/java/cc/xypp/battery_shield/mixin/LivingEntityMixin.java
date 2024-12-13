@@ -81,6 +81,7 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityA
     }
 
     @Override
+    @Deprecated
     public void battery_shield$setMaxShield(float maxShield) {
         ItemStack shieldArmor = ShieldUtil.getShieldArmor((LivingEntity) (Object)this);
         if(shieldArmor != null && shieldArmor.getTag() != null) {

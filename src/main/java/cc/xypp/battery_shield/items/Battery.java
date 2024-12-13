@@ -5,9 +5,11 @@ import cc.xypp.battery_shield.api.ILivingEntityA;
 import cc.xypp.battery_shield.data.UsageEvent;
 import cc.xypp.battery_shield.helper.UsageEventManager;
 import cc.xypp.battery_shield.utils.MiscUtil;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.OutgoingChatMessage;
 import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.resources.ResourceLocation;
@@ -97,7 +99,8 @@ public class Battery extends Item {
         if (p_41433_ instanceof ServerPlayer sp) {
             UsageEventManager.getInstance().send(sp, chargeStart);
         }else if(p_41433_ instanceof  LocalPlayer lp){
-            lp.connection.sendChat(msg.get());
+            lp.displayClientMessage(Component.literal(lp.getName().getString() + " " + msg.get()), true);
+            // lp.connection.sendChat(msg.get());
         }
         p_41433_.startUsingItem(p_41434_);
         return InteractionResultHolder.consume(p_41433_.getItemInHand(p_41434_));
