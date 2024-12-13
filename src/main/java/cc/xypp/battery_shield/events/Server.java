@@ -135,7 +135,7 @@ public class Server {
 
             event.getToolTip().add(
                     Component.translatable(String.format("tooltip.battery_shield.level.%s", color),
-                            String.format("%.1f", currentValue / maxValue),
+                            String.format("%.1f", currentValue),
                             String.format("%.1f", maxValue)
                     ));
         }
