@@ -75,8 +75,9 @@ public class RenderUtils {
         float percentage = (float) value / (float) binding.getMaxValue();
         float k = 1f / (type.level + 1);
         for (int i = 0; i <= type.level; i++) {
+            int level = Math.max(0, Math.round((percentage / k)*21));
             // renderBarCell(guiGraphics, x + i * width / 5 + 4, y, width / 5, height, fill, );
-            rbc(guiGraphics, x + i * width / 5, y, percentage > k ? 100 : Math.round((percentage / k)*21), height, fill);
+            rbc(guiGraphics, x + i * width / 5, y, percentage > k ? 100 : level, height, fill);
             // renderBarCell(guiGraphics, x + i * width / 5, y, width / 5, height, bg, 10);
             rbc(guiGraphics, x + i * width / 5, y, 100, height, bg);
             percentage -= k;

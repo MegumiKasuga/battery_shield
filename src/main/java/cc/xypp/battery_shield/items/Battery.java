@@ -4,30 +4,20 @@ import cc.xypp.battery_shield.Config;
 import cc.xypp.battery_shield.api.ILivingEntityA;
 import cc.xypp.battery_shield.data.UsageEvent;
 import cc.xypp.battery_shield.helper.UsageEventManager;
-import cc.xypp.battery_shield.utils.MiscUtil;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.OutgoingChatMessage;
-import net.minecraft.network.chat.PlayerChatMessage;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Random;
 import java.util.function.Supplier;
 
 
@@ -51,7 +41,7 @@ public class Battery extends Item {
         ILivingEntityA iLivingEntityA = (ILivingEntityA) p_41411_;
         if (p_41411_ instanceof ServerPlayer sp) {
             for (RegistryObject<Battery> battery : Register.BATTERIES.values())
-                sp.getCooldowns().addCooldown(battery.get(), Config.sheild_cooldown);
+                sp.getCooldowns().addCooldown(battery.get(), Config.shield_cooldown);
         }
         iLivingEntityA.battery_shield$setShield(chargeFunction.charge(p_41409_, p_41410_, p_41411_));
         // Math.min((iLivingEntityA).battery_shield$getShield() + Config.battery_value, (iLivingEntityA).battery_shield$getMaxShield())

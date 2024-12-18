@@ -4,6 +4,7 @@ import cc.xypp.battery_shield.api.ILivingEntityA;
 import cc.xypp.battery_shield.data.ShieldType;
 import cc.xypp.battery_shield.items.Register;
 import cc.xypp.battery_shield.packet.TrackingPackat;
+import cc.xypp.battery_shield.packet.UpdateConfigPacket;
 import cc.xypp.battery_shield.utils.EntityUtil;
 import cc.xypp.battery_shield.utils.TypeBinding;
 import net.minecraft.client.Minecraft;
@@ -12,7 +13,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.fml.util.thread.SidedThreadGroups;
+import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
@@ -37,6 +40,7 @@ public class TrackingManager {
                 (v) -> v.equals("1.0.0")
         );
         INSTANCE.registerMessage(0, TrackingPackat.class, TrackingPackat::encode, TrackingPackat::new, this::handle);
+        INSTANCE.registerMessage(1, UpdateConfigPacket.class, UpdateConfigPacket::encode, UpdateConfigPacket::new, UpdateConfigPacket::handle);
     }
 
     public void handle(TrackingPackat packet, Supplier<NetworkEvent.Context> ctx) {
@@ -68,5 +72,9 @@ public class TrackingManager {
         } else {
             INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> entity), new TrackingPackat(entity.getId(), a.battery_shield$getShield(), a.battery_shield$getShieldType()));
         }
+    }
+
+    public void sendUpdateConfigPacket(ServerPlayer player) {
+        INSTANCE.sendTo(new UpdateConfigPacket(), player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
     }
 }

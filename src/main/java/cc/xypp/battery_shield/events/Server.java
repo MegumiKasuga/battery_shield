@@ -12,12 +12,16 @@ import cc.xypp.battery_shield.helper.UsageEventManager;
 import cc.xypp.battery_shield.items.Register;
 import cc.xypp.battery_shield.utils.EntityUtil;
 import cc.xypp.battery_shield.utils.ShieldUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
@@ -34,6 +38,18 @@ import java.util.Random;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = BatteryShield.MODID)
 public class Server {
     private static final Random random = new Random();
+
+    @SubscribeEvent
+    public static void playerLoginEvent(PlayerEvent.PlayerLoggedInEvent event) {
+        Level level = event.getEntity().level();
+        if (level.isClientSide()) return;
+        MinecraftServer server = level.getServer();
+        if (server instanceof IntegratedServer) {
+            Config.loadFromLocal();
+            return;
+        }
+        TrackingManager.getInstance().sendUpdateConfigPacket((ServerPlayer) event.getEntity());
+    }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onEntityJoin(EntityJoinLevelEvent event) {
